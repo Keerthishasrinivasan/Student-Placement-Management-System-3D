@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Student Placement Management System 3D | Next-Gen Campus Recruitment{% endblock %}
+
+{% block content %}
+<section style="padding: 2.5rem 0 3rem; position: relative;">
+  <div class="container">
+    
+    <!-- Hero Header -->
+    <div style="text-align: center; max-width: 860px; margin: 0 auto 2.5rem;">
+      <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.12); border: 1px solid rgba(99, 102, 241, 0.35); padding: 0.35rem 1rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; color: #a5b4fc; margin-bottom: 1.25rem;">
+        <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #38bdf8;" class="pulse"></span>
+        Campus Recruitment Season 2026 Active
+      </div>
+      
+      <h1 style="font-size: 2.75rem; font-weight: 800; line-height: 1.2; letter-spacing: -0.03em; margin-bottom: 1.2rem; color: #fff;">
+        Automate Student Placements with <span style="background: linear-gradient(135deg, #a5b4fc 0%, #38bdf8 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">3D Intelligence & SQL Precision</span>
+      </h1>
+      
+      <p style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 2rem;">
+        A comprehensive full-stack ecosystem automating university placement activities. Empowering students with AI skill matching, mock interviews, and multi-stage application tracking while giving recruiters and placement directors real-time recruitment analytics.
+      </p>
+
+      <div class="flex items-center justify-center gap-4">
+        {% if session.get('role') == 'student' %}
+          <a href="{{ url_for('student.jobs') }}" class="btn btn-primary btn-lg">Browse Open Drives</a>
+          <a href="{{ url_for('student.dashboard') }}" class="btn btn-secondary btn-lg">Open My Dashboard</a>
+        {% elif session.get('role') == 'admin' %}
+          <a href="{{ url_for('admin.dashboard') }}" class="btn btn-primary btn-lg">Placement Director Console</a>
+        {% elif session.get('role') == 'recruiter' %}
+          <a href="{{ url_for('recruiter.dashboard') }}" class="btn btn-primary btn-lg">Recruiter Workspace</a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-lg">Access Student Portal</a>
+          <a href="{{ url_for('auth.demo_login', role='student') }}" class="btn btn-secondary btn-lg">⚡ Instant Demo Preview</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- 3D Interactive Career Galaxy Arena Canvas -->
+    <div class="canvas-container-3d" id="three-hero-canvas">
+      <div class="canvas-overlay-ui">
+        <div style="font-size: 0.8rem; font-weight: 700; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.08em;">
+          WebGL Interactive Visualizer
+        </div>
+        <div style="font-size: 1.1rem; font-weight: 800; color: #fff;">
+          3D Campus Career Galaxy & Recruiting Satellites
+        </div>
+      </div>
+      <div class="canvas-controls-hint hide-mobile">
+        🖱️ Hover over company satellites to inspect package tiers & hiring specs
+      </div>
+    </div>
+
+    <!-- Live Placement Metrics Strip -->
+    <div id="stats-section" style="margin-top: 2.5rem;" class="grid grid-4 gap-4">
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+          📈
+        </div>
+        <div>
+          <div class="kpi-val">{{ stats.placement_rate }}%</div>
+          <div class="kpi-lbl">Overall Placement Rate</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+          🏆
+        </div>
+        <div>
+          <div class="kpi-val">{{ stats.highest_package }} LPA</div>
+          <div class="kpi-lbl">Highest Package Offered</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">
+          💼
+        </div>
+        <div>
+          <div class="kpi-val">{{ stats.average_package }} LPA</div>
+          <div class="kpi-lbl">Average CTC Package</div>
+        </div>
+      </div>
+
+      <div class="kpi-card">
+        <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+          🏢
+        </div>
+        <div>
+          <div class="kpi-val">{{ stats.total_companies }}+</div>
+          <div class="kpi-lbl">Recruiting Partners</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Featured Recruiting Partners -->
+<section id="companies-section" style="padding: 3rem 0; border-top: 1px solid var(--border-color); background: rgba(17, 24, 39, 0.4);">
+  <div class="container">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.85rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+        Top Tier Recruiting Organizations
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Over 85 leading technology companies and Fortune 500 enterprises hire from our university drives.
+      </p>
+    </div>
+
+    <div class="grid grid-3 gap-6">
+      {% for comp in featured_companies %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff;">{{ comp.name }}</h3>
+              <span class="badge badge-{{ comp.tier|lower|replace(' ', '-') }}">{{ comp.tier }}</span>
+            </div>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem; line-height: 1.5;">
+              {{ comp.description[:120] }}...
+            </p>
+            <div style="font-size: 0.8rem; color: var(--text-dim); margin-bottom: 0.5rem;">
+              📍 {{ comp.location }} &bull; ⭐ {{ comp.rating }} / 5.0
+            </div>
+          </div>
+          <div style="border-top: 1px solid var(--border-color); padding-top: 0.75rem; margin-top: 0.75rem; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 0.8rem; color: #38bdf8; font-weight: 600;">{{ comp.jobs.count() }} Openings</span>
+            {% if comp.website %}
+              <a href="{{ comp.website }}" target="_blank" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: underline;">Official Careers &rarr;</a>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Open Campus Job Drives Highlights -->
+<section style="padding: 3rem 0; border-top: 1px solid var(--border-color);">
+  <div class="container">
+    <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+      <div>
+        <h2 style="font-size: 1.85rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+          Active Campus Placement Drives
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem;">
+          Verified job postings with strict academic eligibility criteria and transparent CTC packages.
+        </p>
+      </div>
+      <a href="{{ url_for('student.jobs') }}" class="btn btn-outline hide-mobile">View All Drives &rarr;</a>
+    </div>
+
+    <div class="grid grid-3 gap-6">
+      {% for job in recent_jobs %}
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 0.75rem;">
+              <div>
+                <span class="badge badge-{{ job.company.tier|lower|replace(' ', '-') }}" style="margin-bottom: 0.4rem;">{{ job.company.name }}</span>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff;">{{ job.title }}</h3>
+              </div>
+              <div style="text-align: right;">
+                <div style="font-size: 1.25rem; font-weight: 800; color: #34d399;">{{ job.package_lpa }} LPA</div>
+                <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">CTC</div>
+              </div>
+            </div>
+
+            <div style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 1rem;">
+              <div><strong>Min CGPA:</strong> {{ job.min_cgpa }} &bull; <strong>Backlogs:</strong> &le; {{ job.max_backlogs }}</div>
+              <div><strong>Eligible:</strong> {{ job.eligible_departments }}</div>
+            </div>
+
+            <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-bottom: 1.25rem;">
+              {% for skill in job.skill_req_list[:4] %}
+                <span style="font-size: 0.725rem; background: rgba(255,255,255,0.06); padding: 2px 8px; border-radius: 4px; color: #cbd5e1;">{{ skill }}</span>
+              {% endfor %}
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.5rem;">
+            <a href="{{ url_for('student.job_detail', job_id=job.id) }}" class="btn btn-secondary btn-sm" style="flex: 1;">View Details</a>
+            <a href="{{ url_for('student.job_detail', job_id=job.id) }}" class="btn btn-primary btn-sm" style="flex: 1;">Apply</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- Platform Feature Showcase -->
+<section id="features-section" style="padding: 3.5rem 0; border-top: 1px solid var(--border-color); background: rgba(17, 24, 39, 0.4);">
+  <div class="container">
+    <div style="text-align: center; max-width: 750px; margin: 0 auto 3rem;">
+      <h2 style="font-size: 2rem; font-weight: 800; color: #fff; margin-bottom: 0.75rem;">
+        Engineered for University Excellence
+      </h2>
+      <p style="color: var(--text-muted); font-size: 1rem;">
+        Comprehensive suite of automated tools built specifically for modern university recruitment cells and ambitious students.
+      </p>
+    </div>
+
+    <div class="grid grid-3 gap-6">
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">🪐</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Interactive 3D Career Galaxy</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          WebGL Three.js spatial visualizer rendering company satellites, CTC tiers, student skill polyhedrons, and department placement cylinders.
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">🎯</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">AI Resume & Skill Gap Matcher</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          Real-time readiness algorithm calculating match percentages, highlighting missing skills, and generating targeted upskilling roadmaps.
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">⏱️</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Mock Interview Simulator</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          Timed interview practice tool equipped with real DSA, System Design, and Behavioral HR questions asked by Google, Microsoft, and Amazon.
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📊</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Multi-Round Recruitment Tracker</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          Real-time Kanban step tracker monitoring candidate progression: Applied &rarr; Shortlisted &rarr; Aptitude &rarr; Tech Interview &rarr; HR &rarr; Offer Letter.
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">⚡</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Automated Eligibility Engine</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          Relational SQL engine strictly checking CGPA thresholds, backlog counts, and department criteria before permitting students to apply.
+        </p>
+      </div>
+
+      <div class="card">
+        <div style="font-size: 2rem; margin-bottom: 1rem;">📑</div>
+        <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">Audit Reports & 1-Click CSV</h3>
+        <p style="font-size: 0.875rem; color: var(--text-muted); line-height: 1.5;">
+          Placement directors can filter eligible candidate pools in milliseconds and export clean spreadsheets ready for company HR representatives.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Official Announcements & Notices -->
+<section style="padding: 3rem 0; border-top: 1px solid var(--border-color);">
+  <div class="container">
+    <div style="margin-bottom: 1.5rem;">
+      <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">Official Placement Cell Notices</h2>
+      <p style="font-size: 0.9rem; color: var(--text-muted);">Urgent updates regarding upcoming interview rounds, shortlists, and drive schedules.</p>
+    </div>
+
+    <div class="grid grid-2 gap-4">
+      {% for ann in announcements %}
+        <div class="card" style="padding: 1.2rem;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+            <span class="badge {% if ann.priority == 'Urgent' %}badge-rejected{% elif ann.priority == 'High' %}badge-test{% else %}badge-applied{% endif %}">
+              {{ ann.priority }} Notice
+            </span>
+            <span style="font-size: 0.75rem; color: var(--text-dim);">{{ ann.created_at.strftime('%b %d, %Y') }}</span>
+          </div>
+          <h4 style="font-size: 1.05rem; font-weight: 600; color: #fff; margin-bottom: 0.4rem;">{{ ann.title }}</h4>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.4;">{{ ann.message }}</p>
+          <div style="margin-top: 0.75rem; font-size: 0.75rem; color: #38bdf8;">Audience: {{ ann.target_department }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/three_scene.js') }}"></script>
+{% endblock %}

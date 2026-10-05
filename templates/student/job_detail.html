@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}{{ job.title }} at {{ job.company.name }} | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 980px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 1.5rem;">
+    <a href="{{ url_for('student.jobs') }}" style="color: var(--text-muted); font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+      &larr; Back to Placement Drives
+    </a>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <!-- Job Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+      <div>
+        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+          <span class="badge badge-{{ job.company.tier|lower|replace(' ', '-') }}">{{ job.company.name }}</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Drive Date: {{ job.drive_date.strftime('%b %d, %Y') if job.drive_date else 'TBA' }}</span>
+        </div>
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">{{ job.title }}</h1>
+        <div style="font-size: 0.9rem; color: var(--text-muted); margin-top: 0.35rem;">
+          📍 {{ job.location }} &bull; 🏷️ {{ job.job_type }} &bull; Deadline: {{ job.deadline.strftime('%b %d, %Y') }}
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 2rem; font-weight: 800; color: #34d399; line-height: 1;">
+          {{ job.package_lpa }} LPA
+        </div>
+        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.35rem;">CTC Offered</div>
+        {% if job.stipend_pm %}
+          <div style="font-size: 0.8rem; color: #38bdf8; margin-top: 0.2rem;">₹{{ job.stipend_pm }}/mo Stipend</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- AI Skill Gap & Readiness Card -->
+    <div style="background: rgba(99, 102, 241, 0.08); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: var(--radius-md); padding: 1.25rem; margin-bottom: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <span style="font-size: 1.2rem;">🤖</span>
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: #fff;">AI Match & Skill Gap Diagnostics</h3>
+        </div>
+        <div style="font-size: 1.2rem; font-weight: 800; color: #38bdf8;">
+          {{ match_pct }}% Fit
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: #34d399; margin-bottom: 0.4rem;">
+            ✓ Your Matched Skills ({{ matched_skills|length }})
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+            {% for s in matched_skills %}
+              <span class="badge badge-core">✓ {{ s }}</span>
+            {% endfor %}
+            {% if not matched_skills %}
+              <span style="font-size: 0.8rem; color: var(--text-dim);">No direct skill overlap</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div>
+          <div style="font-size: 0.8rem; font-weight: 600; color: #f59e0b; margin-bottom: 0.4rem;">
+            ⚠️ Missing Skill Requirements ({{ missing_skills|length }})
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 0.35rem;">
+            {% for s in missing_skills %}
+              <span class="badge badge-mass">+ {{ s }}</span>
+            {% endfor %}
+            {% if not missing_skills %}
+              <span style="font-size: 0.8rem; color: #34d399;">All required skills present!</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Academic Eligibility -->
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+        Academic Eligibility Criteria
+      </h3>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+        <div class="grid grid-3 gap-4" style="font-size: 0.875rem;">
+          <div>
+            <div style="color: var(--text-muted);">Minimum CGPA:</div>
+            <div style="font-weight: 700; color: #fff;">{{ job.min_cgpa }} (Your CGPA: {{ student.cgpa }})</div>
+          </div>
+          <div>
+            <div style="color: var(--text-muted);">Max Standing Backlogs:</div>
+            <div style="font-weight: 700; color: #fff;">{{ job.max_backlogs }} (Your Backlogs: {{ student.active_backlogs }})</div>
+          </div>
+          <div>
+            <div style="color: var(--text-muted);">Eligible Departments:</div>
+            <div style="font-weight: 700; color: #fff;">{{ job.eligible_departments }}</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+          {% if is_eligible %}
+            <span style="color: #34d399; font-weight: 600; font-size: 0.85rem;">✓ You meet all academic eligibility rules for this drive.</span>
+          {% else %}
+            <span style="color: #fb7185; font-weight: 600; font-size: 0.85rem;">⚠️ Eligibility Restriction: {{ eligibility_reason }}</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Job Description & Responsibilities -->
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">Role Overview</h3>
+      <div style="font-size: 0.925rem; color: var(--text-muted); line-height: 1.7; white-space: pre-line;">
+        {{ job.description }}
+      </div>
+    </div>
+
+    {% if job.responsibilities %}
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">Key Responsibilities</h3>
+        <div style="font-size: 0.925rem; color: var(--text-muted); line-height: 1.7; white-space: pre-line;">
+          {{ job.responsibilities }}
+        </div>
+      </div>
+    {% endif %}
+
+    <!-- Selection Rounds -->
+    <div style="margin-bottom: 2rem;">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: #fff; margin-bottom: 0.75rem;">Recruitment Process</h3>
+      <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem; font-size: 0.875rem; color: var(--text-muted); white-space: pre-line;">
+        {{ job.selection_process }}
+      </div>
+    </div>
+
+    <!-- Application Action Bottom Bar -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; justify-content: space-between; align-items: center;">
+      <div>
+        {% if application %}
+          <span class="badge badge-applied" style="font-size: 0.9rem; padding: 0.5rem 1rem;">
+            Application Status: {{ application.status }}
+          </span>
+        {% endif %}
+      </div>
+
+      <div>
+        {% if application %}
+          <a href="{{ url_for('student.applications') }}" class="btn btn-secondary">View in Application Tracker &rarr;</a>
+        {% elif is_eligible %}
+          <form method="POST" action="{{ url_for('student.apply_job', job_id=job.id) }}">
+            <button type="submit" class="btn btn-primary btn-lg">Submit Application &rarr;</button>
+          </form>
+        {% else %}
+          <button class="btn btn-secondary btn-lg" disabled style="opacity: 0.5; cursor: not-allowed;">
+            Ineligible for this Drive
+          </button>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

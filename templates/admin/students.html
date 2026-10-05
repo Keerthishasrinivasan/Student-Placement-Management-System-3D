@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Student Placement Directory | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+  
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+        Student Directory & Eligibility Engine
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Filter verified candidate cohorts by academic thresholds, branch, and status. Ready for recruitment drive shortlists.
+      </p>
+    </div>
+
+    <!-- 1-Click Export CSV -->
+    <a href="{{ url_for('admin.export_students_csv', department=selected_dept, min_cgpa=min_cgpa, max_backlogs=max_backlogs, status=selected_status) }}" class="btn btn-primary">
+      📥 Export Filtered Pool to CSV
+    </a>
+  </div>
+
+  <!-- Filter Engine Bar -->
+  <div class="card" style="margin-bottom: 2rem; padding: 1.25rem;">
+    <form method="GET" action="{{ url_for('admin.students') }}">
+      <div class="grid grid-4 gap-4">
+        <div>
+          <label class="form-label">Department / Branch</label>
+          <select name="department" class="form-control">
+            <option value="">All Engineering Branches</option>
+            {% for d in departments %}
+              <option value="{{ d }}" {% if selected_dept == d %}selected{% endif %}>{{ d }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Minimum CGPA (e.g. 7.5)</label>
+          <input type="number" step="0.1" name="min_cgpa" class="form-control" placeholder="Min CGPA" value="{{ min_cgpa or '' }}">
+        </div>
+
+        <div>
+          <label class="form-label">Max Allowed Backlogs</label>
+          <select name="max_backlogs" class="form-control">
+            <option value="">Any Backlogs</option>
+            <option value="0" {% if max_backlogs == 0 %}selected{% endif %}>Strictly 0 Backlogs</option>
+            <option value="1" {% if max_backlogs == 1 %}selected{% endif %}>&le; 1 Backlog</option>
+            <option value="2" {% if max_backlogs == 2 %}selected{% endif %}>&le; 2 Backlogs</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label">Placement Status</label>
+          <select name="status" class="form-control">
+            <option value="">All Statuses</option>
+            <option value="Unplaced" {% if selected_status == 'Unplaced' %}selected{% endif %}>Unplaced Candidates</option>
+            <option value="In Process" {% if selected_status == 'In Process' %}selected{% endif %}>In Process</option>
+            <option value="Placed" {% if selected_status == 'Placed' %}selected{% endif %}>Placed Candidates</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+        <div style="font-size: 0.85rem; color: var(--text-muted);">
+          Matching Candidates: <strong style="color: #38bdf8;">{{ total_count }}</strong>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <a href="{{ url_for('admin.students') }}" class="btn btn-secondary btn-sm">Reset</a>
+          <button type="submit" class="btn btn-primary btn-sm">Apply Eligibility Filters</button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Student Records Table -->
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <thead>
+        <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <th style="padding: 1rem 1.25rem;">Roll & Student</th>
+          <th style="padding: 1rem 1.25rem;">Branch / Batch</th>
+          <th style="padding: 1rem 1.25rem;">CGPA & Backlogs</th>
+          <th style="padding: 1rem 1.25rem;">Technical Skills</th>
+          <th style="padding: 1rem 1.25rem;">Status</th>
+          <th style="padding: 1rem 1.25rem;">Target Firm</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if students %}
+          {% for s in students %}
+            <tr style="border-bottom: 1px solid var(--border-color); transition: background 0.2s ease;">
+              <td style="padding: 1rem 1.25rem;">
+                <div style="font-weight: 700; color: #fff;">{{ s.user.full_name }}</div>
+                <div style="font-size: 0.8rem; color: #38bdf8;">{{ s.roll_number }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">{{ s.user.email }}</div>
+              </td>
+              <td style="padding: 1rem 1.25rem;">
+                <div style="color: #e2e8f0;">{{ s.department }}</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Class of {{ s.batch_year }}</div>
+              </td>
+              <td style="padding: 1rem 1.25rem;">
+                <div style="font-weight: 800; color: #34d399; font-size: 1rem;">{{ s.cgpa }}</div>
+                <div style="font-size: 0.75rem; color: {% if s.active_backlogs > 0 %}#fb7185{% else %}#94a3b8{% endif %};">
+                  {{ s.active_backlogs }} Backlogs
+                </div>
+              </td>
+              <td style="padding: 1rem 1.25rem; max-width: 250px;">
+                <div style="display: flex; flex-wrap: wrap; gap: 0.25rem;">
+                  {% for sk in s.skill_list[:3] %}
+                    <span style="font-size: 0.725rem; background: rgba(255,255,255,0.06); padding: 1px 6px; border-radius: 4px; color: #cbd5e1;">{{ sk }}</span>
+                  {% endfor %}
+                  {% if s.skill_list|length > 3 %}
+                    <span style="font-size: 0.725rem; color: var(--text-dim);">+{{ s.skill_list|length - 3 }}</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td style="padding: 1rem 1.25rem;">
+                <span class="badge {% if s.placement_status == 'Placed' %}badge-offered{% elif s.placement_status == 'In Process' %}badge-shortlisted{% else %}badge-applied{% endif %}">
+                  {{ s.placement_status }}
+                </span>
+              </td>
+              <td style="padding: 1rem 1.25rem; font-size: 0.85rem; color: var(--text-muted);">
+                {{ s.dream_company or 'Open' }}
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" style="padding: 3rem; text-align: center; color: var(--text-muted);">
+              No student records matched the specified eligibility parameters.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

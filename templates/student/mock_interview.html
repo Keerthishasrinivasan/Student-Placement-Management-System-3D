@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+
+{% block title %}Mock Interview Simulator | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(6, 182, 212, 0.15); border: 1px solid rgba(6, 182, 212, 0.35); padding: 0.35rem 0.95rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; color: #67e8f9; margin-bottom: 0.75rem;">
+      ⏱️ Real-Time Interview Simulation
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
+      Technical & HR Mock Interview Simulator
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem; max-width: 680px; margin: 0 auto;">
+      Practice real questions from top recruiters under timed constraints. Review sample solutions and master the STAR method.
+    </p>
+  </div>
+
+  <!-- Setup Control Card -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="flex items-center justify-between" style="flex-wrap: wrap; gap: 1rem;">
+      <div style="flex: 1; min-width: 260px;">
+        <label class="form-label">Interview Track / Category</label>
+        <select id="mock-topic-select" class="form-control">
+          <option value="dsa">Data Structures, Algorithms & System Design</option>
+          <option value="backend">Backend Architecture, SQL & Distributed Systems</option>
+          <option value="hr">HR, Behavioral & Leadership Rounds (STAR Method)</option>
+        </select>
+      </div>
+
+      <div style="display: flex; align-items: flex-end;">
+        <button id="btn-start-mock" class="btn btn-primary btn-lg">
+          ▶️ Start Mock Simulation
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Interactive Session Box (Hidden by default) -->
+  <div id="mock-session-box" class="card" style="display: none; border-color: rgba(99, 102, 241, 0.4); box-shadow: var(--shadow-glow);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <span id="mock-topic-badge" class="badge badge-interview">Topic</span>
+        <span style="font-size: 0.85rem; color: var(--text-muted);">Timed Practice Mode</span>
+      </div>
+      
+      <!-- Live Countdown Timer -->
+      <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(0,0,0,0.4); padding: 0.4rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+        <span style="font-size: 0.8rem; color: var(--text-muted);">Time Remaining:</span>
+        <span id="mock-timer-display" style="font-family: 'JetBrains Mono', monospace; font-size: 1.25rem; font-weight: 700; color: #38bdf8;">03:00</span>
+      </div>
+    </div>
+
+    <!-- Question Text -->
+    <div style="margin-bottom: 1.5rem;">
+      <div style="font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.4rem;">
+        Interviewer Question:
+      </div>
+      <h2 id="mock-question-text" style="font-size: 1.35rem; font-weight: 700; color: #fff; line-height: 1.4;">
+        Question prompt will load here...
+      </h2>
+    </div>
+
+    <!-- Student Answer Scratchpad -->
+    <div class="form-group">
+      <label class="form-label">Your Response / Technical Explanation</label>
+      <textarea class="form-control" rows="5" placeholder="Formulate your answer here or speak out loud to practice pacing..."></textarea>
+    </div>
+
+    <!-- Toggle Hints & Model Answer Buttons -->
+    <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem;">
+      <button id="btn-show-hint" class="btn btn-secondary btn-sm">
+        💡 Show Hint
+      </button>
+      <button id="btn-show-model-answer" class="btn btn-secondary btn-sm">
+        ⭐ View Model Answer & Key Points
+      </button>
+    </div>
+
+    <!-- Collapsible Hint Box -->
+    <div id="mock-hint-box" style="display: none; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; padding: 0.75rem 1rem; border-radius: 4px; font-size: 0.875rem; color: #fde68a; margin-bottom: 1rem;">
+      Hint content...
+    </div>
+
+    <!-- Collapsible Model Answer Box -->
+    <div id="mock-model-answer-box" style="display: none; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; padding: 1rem; border-radius: 4px; font-size: 0.875rem; color: #a7f3d0; margin-bottom: 1.5rem; line-height: 1.6;">
+      Model answer content...
+    </div>
+
+    <!-- Next Question Action -->
+    <div style="border-top: 1px solid var(--border-color); padding-top: 1rem; display: flex; justify-content: flex-end;">
+      <button id="btn-next-question" class="btn btn-primary">
+        Next Question &rarr;
+      </button>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/mock_interview.js') }}"></script>
+{% endblock %}

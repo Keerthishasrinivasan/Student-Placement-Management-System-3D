@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Assessments | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 960px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+      Pre-Placement Practice Assessments
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Timed aptitude and computer science tests modeled after top recruitment online screening rounds.
+    </p>
+  </div>
+
+  <div class="grid grid-2 gap-6">
+    {% for test in assessments %}
+      {% set past = past_results.get(test.id) %}
+      <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+        <div>
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+            <span class="badge badge-dream">{{ test.category }}</span>
+            <span style="font-size: 0.8rem; color: var(--text-muted);">⏱️ {{ test.duration_mins }} Mins</span>
+          </div>
+
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+            {{ test.title }}
+          </h3>
+
+          <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem; line-height: 1.5;">
+            {{ test.description }}
+          </p>
+
+          <div style="background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem; font-size: 0.825rem; color: var(--text-dim);">
+            📝 Questions: <strong>{{ test.total_questions }} MCQs</strong> &bull; Passing Benchmark: <strong>70%</strong>
+          </div>
+        </div>
+
+        <div>
+          {% if past %}
+            <div style="background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); border-radius: var(--radius-md); padding: 0.75rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span style="font-size: 0.75rem; color: #a7f3d0; text-transform: uppercase;">Latest Score:</span>
+                <div style="font-size: 1.15rem; font-weight: 800; color: #34d399;">{{ past.score }} / {{ past.total_marks }} ({{ past.percentage }}%)</div>
+              </div>
+              <span style="font-size: 0.75rem; color: var(--text-dim);">{{ past.completed_at.strftime('%b %d') }}</span>
+            </div>
+          {% endif %}
+
+          <a href="{{ url_for('student.take_assessment', assessment_id=test.id) }}" class="btn btn-primary" style="width: 100%;">
+            {% if past %}Retake Assessment ↺{% else %}Start Assessment &rarr;{% endif %}
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

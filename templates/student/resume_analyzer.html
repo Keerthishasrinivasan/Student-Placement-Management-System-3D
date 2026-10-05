@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}AI Resume & Skill Gap Analyzer | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 900px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem; text-align: center;">
+    <div style="display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.35); padding: 0.35rem 0.95rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 700; color: #a5b4fc; margin-bottom: 0.75rem;">
+      🤖 Intelligent Career Diagnostic
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">
+      AI Resume & Skill Gap Analyzer
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1rem; max-width: 680px; margin: 0 auto;">
+      Compare your current technical skillset against campus job descriptions. Uncover missing requirements and receive tailored preparation roadmaps.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="grid grid-2 gap-4">
+      <div class="form-group">
+        <label class="form-label">Evaluate Against Active Campus Drive</label>
+        <select id="analyzer-job-select" class="form-control">
+          <option value="">-- Choose an Open Campus Job Drive --</option>
+          {% for j in jobs %}
+            <option value="{{ j.id }}">{{ j.title }} ({{ j.company.name }} - {{ j.package_lpa }} LPA)</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Or Compare by Standard Industry Role</label>
+        <select id="analyzer-role-select" class="form-control">
+          <option value="Software Engineer" selected>Software Engineer / SDE-1</option>
+          <option value="Full Stack Developer">Full Stack Web Developer</option>
+          <option value="Data Analyst">Data Analyst & BI Specialist</option>
+          <option value="Cloud & DevOps Engineer">Cloud & DevOps Platform Engineer</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Your Current Technical Skills</label>
+      <textarea id="analyzer-skills-input" class="form-control" rows="3" placeholder="Python, SQL, HTML, CSS, JavaScript, React...">{{ student.skills }}</textarea>
+      <small style="color: var(--text-dim); font-size: 0.75rem;">Populated directly from your profile. You can add or test temporary skills here.</small>
+    </div>
+
+    <button id="btn-run-analyzer" class="btn btn-primary btn-lg" style="width: 100%; margin-top: 0.5rem;">
+      <span>⚡ Analyze Readiness Score & Identify Gaps</span>
+    </button>
+  </div>
+
+  <!-- Results Output Card (Hidden by default, triggered on click) -->
+  <div id="analyzer-result-card" class="card" style="display: none; border-color: rgba(6, 182, 212, 0.4); box-shadow: var(--shadow-cyan);">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+      <div>
+        <h3 style="font-size: 1.35rem; font-weight: 700; color: #fff;">Diagnostic Analysis Result</h3>
+        <span id="res-readiness-badge" class="badge badge-core">Ready for Assessment</span>
+      </div>
+      <div style="text-align: right;">
+        <div id="res-match-score" style="font-size: 2.5rem; font-weight: 800; color: #38bdf8; line-height: 1;">--%</div>
+        <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Match Fit Score</div>
+      </div>
+    </div>
+
+    <div class="grid grid-2 gap-6" style="margin-bottom: 1.5rem;">
+      <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: var(--radius-md); padding: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #34d399; margin-bottom: 0.75rem;">
+          ✓ Verified Matching Skills
+        </h4>
+        <div id="res-matched-tags" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+
+      <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.25); border-radius: var(--radius-md); padding: 1.25rem;">
+        <h4 style="font-size: 0.95rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.75rem;">
+          ⚠️ Identified Skill Gaps (High Recruiter Priority)
+        </h4>
+        <div id="res-missing-tags" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem;">
+      <h4 style="font-size: 0.95rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.75rem;">
+        🚀 Recommended Action Steps to Maximize Placement Odds
+      </h4>
+      <ul id="res-recommendations-list" style="padding-left: 1.25rem; font-size: 0.875rem; color: var(--text-muted); line-height: 1.6;">
+        <!-- Populated by JS -->
+      </ul>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/resume_matcher.js') }}"></script>
+{% endblock %}

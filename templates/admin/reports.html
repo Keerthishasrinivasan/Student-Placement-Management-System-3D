@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Audit Reports | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 980px; padding: 2.5rem 1.5rem;">
+  
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+        Placement Audit & Statistical Reports
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Official analytics on batch placement percentage, department distribution, and compensation tiers.
+      </p>
+    </div>
+
+    <a href="{{ url_for('admin.export_students_csv') }}" class="btn btn-primary">
+      📥 Export Complete Records (CSV)
+    </a>
+  </div>
+
+  <!-- Summary KPI Cards -->
+  <div class="grid grid-3 gap-6" style="margin-bottom: 2rem;">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+        🎓
+      </div>
+      <div>
+        <div class="kpi-val">{{ placement_rate }}%</div>
+        <div class="kpi-lbl">Total Batch Placement</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(59, 130, 246, 0.15); color: #3b82f6;">
+        👥
+      </div>
+      <div>
+        <div class="kpi-val">{{ placed_students }} / {{ total_students }}</div>
+        <div class="kpi-lbl">Students Placed</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+        🏢
+      </div>
+      <div>
+        <div class="kpi-val">{{ tier_counts['Super Dream (15+ LPA)'] }}</div>
+        <div class="kpi-lbl">Super Dream Partners</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Department-wise Placement Breakdown -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <h3 class="card-title"><span>📊</span> Department-Wise Placement Performance</h3>
+    </div>
+
+    <div style="padding: 0; overflow: hidden;">
+      <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+        <thead>
+          <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase;">
+            <th style="padding: 1rem 1.25rem;">Academic Department</th>
+            <th style="padding: 1rem 1.25rem;">Registered</th>
+            <th style="padding: 1rem 1.25rem;">Offers Accepted</th>
+            <th style="padding: 1rem 1.25rem;">Placement Rate</th>
+            <th style="padding: 1rem 1.25rem;">Visual Ratio</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in dept_stats %}
+            <tr style="border-bottom: 1px solid var(--border-color);">
+              <td style="padding: 1rem 1.25rem; font-weight: 700; color: #fff;">{{ row.dept }}</td>
+              <td style="padding: 1rem 1.25rem; color: #cbd5e1;">{{ row.total }}</td>
+              <td style="padding: 1rem 1.25rem; color: #34d399; font-weight: 600;">{{ row.placed }}</td>
+              <td style="padding: 1rem 1.25rem; font-weight: 800; color: #38bdf8;">{{ row.percentage }}%</td>
+              <td style="padding: 1rem 1.25rem; width: 30%;">
+                <div style="width: 100%; height: 8px; background: rgba(255,255,255,0.08); border-radius: 9999px; overflow: hidden;">
+                  <div style="width: {{ row.percentage }}%; height: 100%; background: var(--gradient-glow); border-radius: 9999px;"></div>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Company Tier Breakdown -->
+  <div class="card">
+    <div class="card-header">
+      <h3 class="card-title"><span>🏷️</span> Recruiting Company Tier Breakdown</h3>
+    </div>
+
+    <div class="grid grid-2 gap-4">
+      {% for tier, count in tier_counts.items() %}
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+          <div style="font-weight: 600; color: #cbd5e1;">{{ tier }}</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: #38bdf8;">{{ count }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+</div>
+{% endblock %}

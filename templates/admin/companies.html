@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block title %}Corporate Partners Directory | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+  
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+        Corporate Partners & Hiring Organizations
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Manage recruitment tiers, compensation brackets, and corporate HR points of contact.
+      </p>
+    </div>
+
+    <button class="btn btn-primary" onclick="openCompanyModal()">
+      + Register New Company
+    </button>
+  </div>
+
+  <div class="card" style="padding: 0; overflow: hidden;">
+    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem;">
+      <thead>
+        <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          <th style="padding: 1rem 1.25rem;">Company & Code</th>
+          <th style="padding: 1rem 1.25rem;">Tier Classification</th>
+          <th style="padding: 1rem 1.25rem;">Industry & Location</th>
+          <th style="padding: 1rem 1.25rem;">HR Lead & Contact</th>
+          <th style="padding: 1rem 1.25rem;">Active Drives</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in companies %}
+          <tr style="border-bottom: 1px solid var(--border-color);">
+            <td style="padding: 1rem 1.25rem;">
+              <div style="font-weight: 700; color: #fff; font-size: 1.05rem;">{{ c.name }}</div>
+              <span style="font-size: 0.75rem; color: #38bdf8;">Code: {{ c.code }}</span>
+            </td>
+            <td style="padding: 1rem 1.25rem;">
+              <span class="badge badge-{{ c.tier|lower|replace(' ', '-') }}">{{ c.tier }}</span>
+            </td>
+            <td style="padding: 1rem 1.25rem;">
+              <div style="color: #cbd5e1;">{{ c.industry }}</div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">📍 {{ c.location }}</div>
+            </td>
+            <td style="padding: 1rem 1.25rem;">
+              <div style="font-weight: 600; color: #fff;">{{ c.hr_name or 'University Relations' }}</div>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">{{ c.hr_email or 'hr@company.com' }}</div>
+            </td>
+            <td style="padding: 1rem 1.25rem;">
+              <span style="font-weight: 700; color: #34d399;">{{ c.jobs.count() }} Drives</span>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<!-- Add Company Modal -->
+<div id="company-modal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center; padding: 1.5rem; backdrop-filter: blur(8px);">
+  <div class="card" style="width: 100%; max-width: 580px; animation: fadeIn 0.2s ease;">
+    <div class="card-header">
+      <h3 class="card-title"><span>🏢</span> Register Corporate Partner</h3>
+      <button onclick="closeCompanyModal()" style="background:none; border:none; color:var(--text-muted); font-size:1.5rem; cursor:pointer;">&times;</button>
+    </div>
+
+    <form method="POST" action="{{ url_for('admin.companies') }}">
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Company Name *</label>
+          <input type="text" name="name" class="form-control" placeholder="e.g. Adobe Systems" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Short Code *</label>
+          <input type="text" name="code" class="form-control" placeholder="ADBE" required>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Industry Domain</label>
+          <input type="text" name="industry" class="form-control" value="Software & Cloud">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Recruitment Tier</label>
+          <select name="tier" class="form-control">
+            <option value="Super Dream">Super Dream (&gt;15 LPA)</option>
+            <option value="Dream" selected>Dream (8-15 LPA)</option>
+            <option value="Core">Core Engineering (5-8 LPA)</option>
+            <option value="Mass Hiring">Mass / Standard (&lt;5 LPA)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">HR Lead Name</label>
+          <input type="text" name="hr_name" class="form-control" placeholder="Jane Doe">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">HR Email</label>
+          <input type="email" name="hr_email" class="form-control" placeholder="jane@company.com">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Company Website</label>
+        <input type="url" name="website" class="form-control" placeholder="https://careers.adobe.com">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea name="description" class="form-control" rows="2" placeholder="Brief organization profile..."></textarea>
+      </div>
+
+      <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+        <button type="button" class="btn btn-secondary" onclick="closeCompanyModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save Partner &rarr;</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+function openCompanyModal() {
+  document.getElementById('company-modal').style.display = 'flex';
+}
+function closeCompanyModal() {
+  document.getElementById('company-modal').style.display = 'none';
+}
+</script>
+{% endblock %}

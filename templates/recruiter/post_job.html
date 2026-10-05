@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}Post New Campus Opening | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 840px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <a href="{{ url_for('recruiter.dashboard') }}" style="color: var(--text-muted); font-size: 0.85rem; display: inline-flex; align-items: center; gap: 0.4rem;">
+      &larr; Back to Recruiter Dashboard
+    </a>
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-top: 0.5rem;">
+      Publish Campus Recruitment Drive
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Define role details, package CTC, and academic eligibility requirements for student candidates.
+    </p>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="{{ url_for('recruiter.post_job') }}">
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Job Title / Designation *</label>
+          <input type="text" name="title" class="form-control" placeholder="e.g. Graduate Software Engineer" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Employment Type</label>
+          <select name="job_type" class="form-control">
+            <option value="Full Time">Full Time</option>
+            <option value="Internship">Internship</option>
+            <option value="FTE + Internship">FTE + Internship</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-3 gap-4">
+        <div class="form-group">
+          <label class="form-label">Annual CTC Package (LPA) *</label>
+          <input type="number" step="0.1" name="package_lpa" class="form-control" placeholder="e.g. 14.5" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Monthly Stipend (₹/mo)</label>
+          <input type="number" name="stipend_pm" class="form-control" placeholder="e.g. 50000">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Location / Base Office</label>
+          <input type="text" name="location" class="form-control" value="Bengaluru / Hyderabad">
+        </div>
+      </div>
+
+      <div class="card-header" style="margin-top: 1rem;">
+        <h3 class="card-title"><span>🎯</span> Academic Eligibility Constraints</h3>
+      </div>
+
+      <div class="grid grid-3 gap-4">
+        <div class="form-group">
+          <label class="form-label">Minimum CGPA Threshold *</label>
+          <input type="number" step="0.1" min="0" max="10" name="min_cgpa" class="form-control" value="7.5" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Maximum Allowed Backlogs</label>
+          <input type="number" min="0" name="max_backlogs" class="form-control" value="0">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Application Deadline *</label>
+          <input type="date" name="deadline" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Eligible Departments</label>
+        <input type="text" name="eligible_departments" class="form-control" value="Computer Science, Information Technology, Electronics & Communication">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Required Technical Skills (Comma separated)</label>
+        <input type="text" name="skills_required" class="form-control" placeholder="e.g. Python, SQL, Data Structures, System Design" value="Python, SQL, Data Structures, Algorithms">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Job Description *</label>
+        <textarea name="description" class="form-control" rows="4" placeholder="Detail the core duties, challenges, and team expectations..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Selection Process & Interview Rounds</label>
+        <textarea name="selection_process" class="form-control" rows="3" placeholder="e.g. Round 1: Online Coding -> Round 2: Technical -> Round 3: HR"></textarea>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end; gap: 0.75rem;">
+        <a href="{{ url_for('recruiter.dashboard') }}" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary btn-lg">Publish Campus Opening &rarr;</button>
+      </div>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

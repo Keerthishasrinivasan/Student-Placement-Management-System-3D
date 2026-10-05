@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Taking {{ assessment.title }} | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 860px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+      <span class="badge badge-dream" style="margin-bottom: 0.35rem;">{{ assessment.category }}</span>
+      <h1 style="font-size: 1.6rem; font-weight: 800; color: #fff;">{{ assessment.title }}</h1>
+    </div>
+    <div style="background: rgba(0,0,0,0.5); padding: 0.5rem 1rem; border-radius: var(--radius-md); border: 1px solid var(--border-color); text-align: center;">
+      <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">Duration</div>
+      <div style="font-size: 1.2rem; font-weight: 700; color: #38bdf8;">{{ assessment.duration_mins }} Mins</div>
+    </div>
+  </div>
+
+  <form method="POST" action="{{ url_for('student.submit_assessment', assessment_id=assessment.id) }}">
+    <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+      {% for q in questions %}
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+            <span style="font-size: 0.8rem; font-weight: 700; color: #a5b4fc;">Question {{ loop.index }} of {{ questions|length }}</span>
+            <span class="badge badge-core" style="font-size: 0.7rem;">{{ q.difficulty }}</span>
+          </div>
+
+          <h3 style="font-size: 1.1rem; font-weight: 600; color: #fff; margin-bottom: 1.25rem; line-height: 1.5;">
+            {{ q.question_text }}
+          </h3>
+
+          <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <label style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s ease;">
+              <input type="radio" name="question_{{ q.id }}" value="A" required>
+              <span style="font-weight: 600; color: #38bdf8;">A.</span>
+              <span style="color: #e2e8f0; font-size: 0.9rem;">{{ q.option_a }}</span>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s ease;">
+              <input type="radio" name="question_{{ q.id }}" value="B">
+              <span style="font-weight: 600; color: #38bdf8;">B.</span>
+              <span style="color: #e2e8f0; font-size: 0.9rem;">{{ q.option_b }}</span>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s ease;">
+              <input type="radio" name="question_{{ q.id }}" value="C">
+              <span style="font-weight: 600; color: #38bdf8;">C.</span>
+              <span style="color: #e2e8f0; font-size: 0.9rem;">{{ q.option_c }}</span>
+            </label>
+
+            <label style="display: flex; align-items: center; gap: 0.75rem; background: rgba(255,255,255,0.03); border: 1px solid var(--border-color); padding: 0.75rem 1rem; border-radius: var(--radius-md); cursor: pointer; transition: background 0.2s ease;">
+              <input type="radio" name="question_{{ q.id }}" value="D">
+              <span style="font-weight: 600; color: #38bdf8;">D.</span>
+              <span style="color: #e2e8f0; font-size: 0.9rem;">{{ q.option_d }}</span>
+            </label>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+      <a href="{{ url_for('student.assessments') }}" class="btn btn-secondary">Cancel</a>
+      <button type="submit" class="btn btn-primary btn-lg">
+        Submit Assessment & Calculate Score &rarr;
+      </button>
+    </div>
+  </form>
+
+</div>
+{% endblock %}

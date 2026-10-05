@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Student Placement Management System 3D{% endblock %}</title>
+  
+  <!-- Modern Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+  <!-- Three.js (3D WebGL Library) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <!-- Brand Logo -->
+      <a href="{{ url_for('main.index') }}" class="nav-brand">
+        <div class="brand-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/>
+            <path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          Placement<span>Hub</span> <small style="font-size: 0.65rem; background: rgba(99,102,241,0.25); border: 1px solid rgba(99,102,241,0.5); padding: 2px 6px; border-radius: 6px; font-weight: 700; color: #a5b4fc;">3D</small>
+        </div>
+      </a>
+
+      <!-- Navigation Links -->
+      <nav>
+        <ul class="nav-links hide-mobile" id="main-nav-links">
+          <li><a href="{{ url_for('main.index') }}" class="nav-link">Home</a></li>
+          
+          {% if session.get('role') == 'student' %}
+            <li><a href="{{ url_for('student.dashboard') }}" class="nav-link">Dashboard</a></li>
+            <li><a href="{{ url_for('student.jobs') }}" class="nav-link">Browse Jobs</a></li>
+            <li><a href="{{ url_for('student.applications') }}" class="nav-link">Applications Tracker</a></li>
+            <li><a href="{{ url_for('student.resume_analyzer') }}" class="nav-link">AI Skill Matcher</a></li>
+            <li><a href="{{ url_for('student.mock_interview') }}" class="nav-link">Mock Interview</a></li>
+            <li><a href="{{ url_for('student.assessments') }}" class="nav-link">Assessments</a></li>
+          
+          {% elif session.get('role') == 'recruiter' %}
+            <li><a href="{{ url_for('recruiter.dashboard') }}" class="nav-link">Recruiter Portal</a></li>
+            <li><a href="{{ url_for('recruiter.post_job') }}" class="nav-link">+ Post Job</a></li>
+
+          {% elif session.get('role') == 'admin' %}
+            <li><a href="{{ url_for('admin.dashboard') }}" class="nav-link">Director Console</a></li>
+            <li><a href="{{ url_for('admin.students') }}" class="nav-link">Student Directory</a></li>
+            <li><a href="{{ url_for('admin.companies') }}" class="nav-link">Companies</a></li>
+            <li><a href="{{ url_for('admin.drives') }}" class="nav-link">Drives</a></li>
+            <li><a href="{{ url_for('admin.reports') }}" class="nav-link">Placement Reports</a></li>
+          {% else %}
+            <li><a href="{{ url_for('main.index') }}#stats-section" class="nav-link">Placement Stats</a></li>
+            <li><a href="{{ url_for('main.index') }}#companies-section" class="nav-link">Top Recruiters</a></li>
+            <li><a href="{{ url_for('main.index') }}#features-section" class="nav-link">Features</a></li>
+          {% endif %}
+        </ul>
+      </nav>
+
+      <!-- Action Buttons & Auth State -->
+      <div class="nav-actions">
+        {% if session.get('user_id') %}
+          <div class="user-profile-pill">
+            <div class="user-avatar-circle" style="background: {{ current_user.avatar_color if current_user else '#6366f1' }};">
+              {{ session.get('user_name', 'U')[0] }}
+            </div>
+            <div class="hide-mobile" style="text-align: left;">
+              <div style="font-size: 0.825rem; font-weight: 600; line-height: 1.1;">{{ session.get('user_name') }}</div>
+              <div style="font-size: 0.7rem; color: var(--text-muted); text-transform: uppercase;">{{ session.get('role') }}</div>
+            </div>
+          </div>
+          
+          {% if session.get('role') == 'student' %}
+            <a href="{{ url_for('student.profile') }}" class="btn btn-secondary btn-sm" title="My Profile">Profile</a>
+          {% endif %}
+          
+          <a href="{{ url_for('auth.logout') }}" class="btn btn-secondary btn-sm" style="color: #fda4af;">Logout</a>
+
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-secondary btn-sm">Sign In</a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-primary btn-sm">Register</a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- Flash Messages Container -->
+  <div class="flash-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert alert-{{ category }}">
+            <span>{{ message }}</span>
+            <button onclick="this.parentElement.remove()" style="background:none; border:none; color:inherit; cursor:pointer; font-weight:bold; font-size:1.1rem;">&times;</button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <!-- Main Body Content -->
+  <main style="flex: 1;">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <div class="grid grid-4 gap-6" style="margin-bottom: 2rem;">
+        <div>
+          <div class="flex items-center gap-2" style="font-weight: 700; color: #fff; margin-bottom: 0.75rem;">
+            <div class="brand-icon" style="width: 28px; height: 28px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+            </div>
+            PlacementHub 3D
+          </div>
+          <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.5;">
+            Next-generation campus recruitment and placement automation ecosystem equipped with 3D career arena, AI skill matching, and end-to-end multi-round interview tracking.
+          </p>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.9rem; margin-bottom: 0.75rem;">Student Tools</h4>
+          <ul style="list-style: none; font-size: 0.825rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-muted);">
+            <li><a href="{{ url_for('student.jobs') }}">Campus Job Board</a></li>
+            <li><a href="{{ url_for('student.resume_analyzer') }}">AI Resume & Skill Gap Analyzer</a></li>
+            <li><a href="{{ url_for('student.mock_interview') }}">Interactive Mock Interview</a></li>
+            <li><a href="{{ url_for('student.assessments') }}">Timed Aptitude Assessments</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.9rem; margin-bottom: 0.75rem;">Recruiters & Admins</h4>
+          <ul style="list-style: none; font-size: 0.825rem; display: flex; flex-direction: column; gap: 0.5rem; color: var(--text-muted);">
+            <li><a href="{{ url_for('recruiter.dashboard') }}">Talent Pipeline Portal</a></li>
+            <li><a href="{{ url_for('admin.students') }}">CGPA Eligibility Filter Engine</a></li>
+            <li><a href="{{ url_for('admin.drives') }}">Campus Drive Calendar</a></li>
+            <li><a href="{{ url_for('admin.reports') }}">Audit Reports & CSV Export</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 style="color: #fff; font-size: 0.9rem; margin-bottom: 0.75rem;">Placement Cell</h4>
+          <p style="font-size: 0.825rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+            University Directorate of Training & Placement<br>
+            Tech Campus Tower, Block 4
+          </p>
+          <div style="font-size: 0.8rem; color: #38bdf8;">
+            Email: placement.director@university.edu
+          </div>
+        </div>
+      </div>
+
+      <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; font-size: 0.775rem; color: var(--text-dim);">
+        <div>&copy; 2026 Student Placement Management System. All rights reserved.</div>
+        <div>Engineered with Python (Flask), Three.js WebGL, HTML5, CSS3 & SQL.</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Base JS -->
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

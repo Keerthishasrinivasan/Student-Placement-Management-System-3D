@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+
+{% block title %}Placement Director Console | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+  
+  <!-- Header -->
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem;">
+        <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff;">
+          Director of Training & Placement Console
+        </h1>
+        <span class="badge badge-super-dream">Administrator Mode</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Executive placement metrics, drive scheduling, corporate partnerships, and student eligibility management.
+      </p>
+    </div>
+
+    <div class="flex gap-3">
+      <a href="{{ url_for('admin.students') }}" class="btn btn-secondary btn-sm">
+        👥 Student Directory
+      </a>
+      <a href="{{ url_for('admin.drives') }}" class="btn btn-primary btn-sm">
+        📅 + Schedule Drive
+      </a>
+    </div>
+  </div>
+
+  <!-- KPI Grid -->
+  <div class="grid grid-4 gap-4" style="margin-bottom: 2rem;">
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(16, 185, 129, 0.15); color: #10b981;">
+        📈
+      </div>
+      <div>
+        <div class="kpi-val">{{ stats.placement_rate }}%</div>
+        <div class="kpi-lbl">Batch Placement Rate</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(139, 92, 246, 0.15); color: #8b5cf6;">
+        🏆
+      </div>
+      <div>
+        <div class="kpi-val">{{ stats.highest_ctc }} LPA</div>
+        <div class="kpi-lbl">Apex Package Offered</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(6, 182, 212, 0.15); color: #06b6d4;">
+        💼
+      </div>
+      <div>
+        <div class="kpi-val">{{ stats.avg_ctc }} LPA</div>
+        <div class="kpi-lbl">Mean CTC Package</div>
+      </div>
+    </div>
+
+    <div class="kpi-card">
+      <div class="kpi-icon-wrap" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b;">
+        🏢
+      </div>
+      <div>
+        <div class="kpi-val">{{ stats.total_companies }}</div>
+        <div class="kpi-lbl">Corporate Partners</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Holographic Analytics Chart Section -->
+  <div class="card" style="margin-bottom: 2.5rem; padding: 1.5rem;">
+    <div class="card-header">
+      <div>
+        <h3 class="card-title"><span>🔮</span> 3D Placement Hologram Analytics</h3>
+        <p style="font-size: 0.825rem; color: var(--text-muted); margin-top: 0.2rem;">
+          WebGL 3D cylindrical distribution representing department placement ratios and compensation cohorts.
+        </p>
+      </div>
+      <a href="{{ url_for('admin.reports') }}" class="btn btn-outline btn-sm">Audit Reports &rarr;</a>
+    </div>
+
+    <div style="position: relative; width: 100%; height: 360px; background: radial-gradient(circle at center, #172036 0%, #0b0f19 85%); border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--border-color);" id="three-analytics-canvas">
+      <div style="position: absolute; bottom: 10px; right: 15px; font-size: 0.75rem; color: var(--text-dim); pointer-events: none;">
+        Real-time WebGL Spatial Visualization &bull; Rotate to Inspect
+      </div>
+    </div>
+  </div>
+
+  <!-- Operational Columns: Upcoming Drives & Placement Notices -->
+  <div class="grid grid-2 gap-6" style="margin-bottom: 2rem;">
+    
+    <!-- Upcoming Drives -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><span>📅</span> Upcoming Scheduled Drives</h3>
+        <a href="{{ url_for('admin.drives') }}" class="btn btn-secondary btn-sm">Manage &rarr;</a>
+      </div>
+
+      {% if upcoming_drives %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for d in upcoming_drives %}
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+                <h4 style="font-size: 1.05rem; font-weight: 700; color: #fff;">{{ d.title }}</h4>
+                <span class="badge badge-dream">{{ d.mode }}</span>
+              </div>
+              <div style="font-size: 0.85rem; color: var(--text-muted);">
+                Date: <strong style="color: #38bdf8;">{{ d.drive_date.strftime('%B %d, %Y') }}</strong> &bull; Venue: {{ d.venue }}
+              </div>
+              <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.35rem;">
+                Eligibility: {{ d.eligibility_summary }}
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">No upcoming drives scheduled.</p>
+      {% endif %}
+    </div>
+
+    <!-- Quick Announcements & Broadcasts -->
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><span>📢</span> Live Broadcast Notices</h3>
+        <a href="{{ url_for('admin.announcements') }}" class="btn btn-secondary btn-sm">+ Post Notice</a>
+      </div>
+
+      {% if recent_announcements %}
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+          {% for a in recent_announcements %}
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1rem;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.35rem;">
+                <h4 style="font-size: 1rem; font-weight: 600; color: #fff;">{{ a.title }}</h4>
+                <span class="badge {% if a.priority == 'Urgent' %}badge-rejected{% elif a.priority == 'High' %}badge-test{% else %}badge-applied{% endif %}">
+                  {{ a.priority }}
+                </span>
+              </div>
+              <p style="font-size: 0.825rem; color: var(--text-muted); line-height: 1.4;">{{ a.message[:110] }}...</p>
+              <div style="font-size: 0.75rem; color: #38bdf8; margin-top: 0.35rem;">Target: {{ a.target_department }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--text-muted); font-size: 0.9rem;">No broadcast notices published.</p>
+      {% endif %}
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{{ url_for('static', filename='js/three_analytics.js') }}"></script>
+{% endblock %}

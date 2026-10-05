@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Application Tracker | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 2.5rem 1.5rem;">
+  
+  <div class="flex items-center justify-between" style="margin-bottom: 2rem;">
+    <div>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+        Recruitment Application Tracker
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Monitor real-time interview rounds, schedule links, and offer letter approvals.
+      </p>
+    </div>
+    <a href="{{ url_for('student.jobs') }}" class="btn btn-outline btn-sm">Browse More Jobs</a>
+  </div>
+
+  {% if applications %}
+    <div style="display: flex; flex-direction: column; gap: 2rem;">
+      {% for app in applications %}
+        <div class="card" style="position: relative;">
+          
+          <!-- Header of Application Card -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1rem;">
+            <div>
+              <div style="display: flex; align-items: center; gap: 0.6rem; margin-bottom: 0.4rem;">
+                <span class="badge badge-{{ app.job.company.tier|lower|replace(' ', '-') }}">{{ app.job.company.name }}</span>
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Applied on {{ app.applied_date.strftime('%b %d, %Y') }}</span>
+              </div>
+              <h2 style="font-size: 1.35rem; font-weight: 700; color: #fff;">{{ app.job.title }}</h2>
+            </div>
+
+            <div style="text-align: right;">
+              <div style="font-size: 1.4rem; font-weight: 800; color: #34d399;">{{ app.job.package_lpa }} LPA</div>
+              <span class="badge {% if app.status == 'Offered' or app.status == 'Accepted' %}badge-offered{% elif app.status == 'Rejected' %}badge-rejected{% else %}badge-interview{% endif %}" style="margin-top: 0.4rem;">
+                {{ app.status }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Multi-Stage Visual Pipeline Tracker -->
+          <div class="pipeline-track">
+            {% set current_idx = app.current_round_index %}
+            
+            <div class="pipeline-step {% if current_idx >= 1 %}completed{% endif %} {% if current_idx == 1 and app.status == 'Applied' %}active{% endif %}">
+              <div class="step-circle">1</div>
+              <div class="step-label">Applied</div>
+            </div>
+
+            <div class="pipeline-step {% if current_idx >= 2 %}completed{% endif %} {% if app.status == 'Shortlisted' %}active{% endif %}">
+              <div class="step-circle">2</div>
+              <div class="step-label">Shortlisted</div>
+            </div>
+
+            <div class="pipeline-step {% if current_idx >= 3 %}completed{% endif %} {% if app.status == 'Aptitude Test' %}active{% endif %}">
+              <div class="step-circle">3</div>
+              <div class="step-label">Aptitude Test</div>
+            </div>
+
+            <div class="pipeline-step {% if current_idx >= 4 %}completed{% endif %} {% if app.status == 'Technical Interview' %}active{% endif %}">
+              <div class="step-circle">4</div>
+              <div class="step-label">Tech Interview</div>
+            </div>
+
+            <div class="pipeline-step {% if current_idx >= 5 %}completed{% endif %} {% if app.status == 'HR Interview' %}active{% endif %}">
+              <div class="step-circle">5</div>
+              <div class="step-label">HR Round</div>
+            </div>
+
+            <div class="pipeline-step {% if current_idx >= 6 %}completed{% endif %} {% if app.status == 'Offered' or app.status == 'Accepted' %}active{% endif %}">
+              <div class="step-circle">6</div>
+              <div class="step-label">Offer Issued</div>
+            </div>
+          </div>
+
+          <!-- Active Details, Interview Schedule & Recruiter Notes -->
+          <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 1.25rem; margin-top: 1.5rem;">
+            <div class="grid grid-2 gap-4">
+              <div>
+                <h4 style="font-size: 0.9rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.5rem;">
+                  Interview / Round Status
+                </h4>
+                {% if app.interview_date %}
+                  <div style="font-size: 0.875rem; color: #fff; margin-bottom: 0.35rem;">
+                    📅 <strong>Scheduled:</strong> {{ app.interview_date.strftime('%A, %B %d, %Y at %I:%M %p') }}
+                  </div>
+                  {% if app.interview_link %}
+                    <div style="font-size: 0.875rem;">
+                      🔗 <strong>Virtual Meeting:</strong> 
+                      <a href="{{ app.interview_link }}" target="_blank" style="color: #38bdf8; text-decoration: underline; font-weight: 600;">
+                        Enter Interview Room &rarr;
+                      </a>
+                    </div>
+                  {% endif %}
+                {% else %}
+                  <div style="font-size: 0.85rem; color: var(--text-dim);">
+                    Round logistics will be posted here by {{ app.job.company.name }} HR once scheduled.
+                  </div>
+                {% endif %}
+              </div>
+
+              <div>
+                <h4 style="font-size: 0.9rem; font-weight: 600; color: #cbd5e1; margin-bottom: 0.5rem;">
+                  Recruiter Feedback & Notes
+                </h4>
+                <div style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.5;">
+                  {{ app.recruiter_notes or 'Application screened. No specific comments logged yet.' }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Offer Acceptance Action Bar -->
+          {% if app.status == 'Offered' %}
+            <div style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.4); border-radius: var(--radius-md); padding: 1.25rem; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <h3 style="font-size: 1.15rem; font-weight: 700; color: #34d399; margin-bottom: 0.2rem;">
+                  🎉 Formal Offer Extended: {{ app.job.package_lpa }} LPA!
+                </h3>
+                <p style="font-size: 0.85rem; color: var(--text-muted);">
+                  {{ app.job.company.name }} has extended a placement offer. Please confirm your acceptance or release for other opportunities.
+                </p>
+              </div>
+
+              <div style="display: flex; gap: 0.75rem;">
+                <form method="POST" action="{{ url_for('student.accept_offer', app_id=app.id) }}">
+                  <button type="submit" class="btn btn-success">✓ Accept Offer</button>
+                </form>
+                <form method="POST" action="{{ url_for('student.decline_offer', app_id=app.id) }}">
+                  <button type="submit" class="btn btn-danger btn-sm">Decline</button>
+                </form>
+              </div>
+            </div>
+          {% elif app.status == 'Accepted' %}
+            <div style="margin-top: 1.5rem; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: var(--radius-md); padding: 1rem; color: #a7f3d0; font-size: 0.9rem; font-weight: 600;">
+              ✨ Offer Formally Accepted! You are successfully placed at {{ app.job.company.name }}.
+            </div>
+          {% endif %}
+
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="card" style="text-align: center; padding: 4rem 1.5rem;">
+      <h3 style="font-size: 1.3rem; font-weight: 700; color: #fff; margin-bottom: 0.5rem;">No Applications Yet</h3>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Explore open campus drives and submit applications to start your recruitment journey.
+      </p>
+      <a href="{{ url_for('student.jobs') }}" class="btn btn-primary">Browse Open Placement Drives &rarr;</a>
+    </div>
+  {% endif %}
+
+</div>
+{% endblock %}

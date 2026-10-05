@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}My Profile | PlacementHub 3D{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 800px; padding: 2.5rem 1.5rem;">
+  
+  <div style="margin-bottom: 2rem;">
+    <h1 style="font-size: 1.85rem; font-weight: 800; color: #fff; margin-bottom: 0.35rem;">
+      Student Placement Profile
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Keep your academic records, skills, and portfolio updated for corporate recruiters.
+    </p>
+  </div>
+
+  <div class="card">
+    <form method="POST" action="{{ url_for('student.profile') }}">
+      
+      <div class="card-header">
+        <h3 class="card-title"><span>👤</span> Personal & Contact Information</h3>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" name="full_name" class="form-control" value="{{ user.full_name }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">University Email</label>
+          <input type="email" class="form-control" value="{{ user.email }}" disabled style="opacity: 0.7;">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" value="{{ user.phone or '' }}" placeholder="+91 98765 43210">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Roll Number</label>
+          <input type="text" class="form-control" value="{{ student.roll_number }}" disabled style="opacity: 0.7;">
+        </div>
+      </div>
+
+      <div class="card-header" style="margin-top: 1.5rem;">
+        <h3 class="card-title"><span>🎓</span> Academic Performance</h3>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Department / Branch</label>
+          <input type="text" name="department" class="form-control" value="{{ student.department }}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Graduating Batch Year</label>
+          <input type="number" name="batch_year" class="form-control" value="{{ student.batch_year }}">
+        </div>
+      </div>
+
+      <div class="grid grid-4 gap-4">
+        <div class="form-group">
+          <label class="form-label">Cumulative CGPA</label>
+          <input type="number" step="0.01" min="0" max="10" name="cgpa" class="form-control" value="{{ student.cgpa }}" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">10th Grade %</label>
+          <input type="number" step="0.1" name="tenth_percentage" class="form-control" value="{{ student.tenth_percentage }}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">12th Grade %</label>
+          <input type="number" step="0.1" name="twelfth_percentage" class="form-control" value="{{ student.twelfth_percentage }}">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Active Backlogs</label>
+          <input type="number" name="active_backlogs" class="form-control" value="{{ student.active_backlogs }}">
+        </div>
+      </div>
+
+      <div class="card-header" style="margin-top: 1.5rem;">
+        <h3 class="card-title"><span>💻</span> Technical Skills & Career Aspirations</h3>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Technical Skills (Comma separated)</label>
+        <input type="text" name="skills" class="form-control" value="{{ student.skills }}" placeholder="e.g. Python, SQL, C++, React, Docker">
+        <small style="color: var(--text-dim); font-size: 0.75rem;">These skills directly feed into your 3D Skill Polyhedron and AI Matcher.</small>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Dream Company Target</label>
+          <input type="text" name="dream_company" class="form-control" value="{{ student.dream_company or '' }}" placeholder="e.g. Google, Microsoft">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Preferred Job Role</label>
+          <input type="text" name="preferred_role" class="form-control" value="{{ student.preferred_role or '' }}" placeholder="e.g. SDE-1, Cloud Architect">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">GitHub Portfolio URL</label>
+          <input type="url" name="github_url" class="form-control" value="{{ student.github_url or '' }}" placeholder="https://github.com/username">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">LinkedIn Profile URL</label>
+          <input type="url" name="linkedin_url" class="form-control" value="{{ student.linkedin_url or '' }}" placeholder="https://linkedin.com/in/username">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Professional Bio / Executive Summary</label>
+        <textarea name="bio" class="form-control" rows="3" placeholder="Brief technical summary...">{{ student.bio or '' }}</textarea>
+      </div>
+
+      <div style="margin-top: 1.5rem; display: flex; justify-content: flex-end;">
+        <button type="submit" class="btn btn-primary btn-lg">
+          Save Profile Changes &rarr;
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+{% endblock %}

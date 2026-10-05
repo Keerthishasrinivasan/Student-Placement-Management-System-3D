@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+
+{% block title %}Register | Student Placement Management System{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 680px; padding: 3rem 1.5rem;">
+  <div class="card">
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <h2 style="font-size: 1.6rem; font-weight: 700; color: #fff;">Candidate & Recruiter Registration</h2>
+      <p style="font-size: 0.875rem; color: var(--text-muted);">Create your campus recruitment account to access jobs and drives</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <div class="form-group">
+        <label class="form-label">Registering As</label>
+        <select name="role" id="role-select" class="form-control" onchange="toggleRoleFields(this.value)">
+          <option value="student" selected>Student Candidate</option>
+          <option value="recruiter">Company Talent Recruiter</option>
+        </select>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Full Name *</label>
+          <input type="text" name="full_name" class="form-control" placeholder="e.g. Rahul Sharma" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address *</label>
+          <input type="email" name="email" class="form-control" placeholder="rahul@university.edu" required>
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Phone Number</label>
+          <input type="tel" name="phone" class="form-control" placeholder="+91 98765 43210">
+        </div>
+
+        <!-- Student specific: Roll number -->
+        <div class="form-group student-field">
+          <label class="form-label">Roll / University Registration Number *</label>
+          <input type="text" name="roll_number" class="form-control" placeholder="e.g. 2022CS0144">
+        </div>
+
+        <!-- Recruiter specific: Company Name -->
+        <div class="form-group recruiter-field" style="display: none;">
+          <label class="form-label">Company / Organization Name *</label>
+          <input type="text" name="company_name" class="form-control" placeholder="e.g. TechCorp Systems">
+        </div>
+      </div>
+
+      <!-- Student Academic Details -->
+      <div class="student-field">
+        <div class="grid grid-2 gap-4">
+          <div class="form-group">
+            <label class="form-label">Department / Branch *</label>
+            <select name="department" class="form-control">
+              <option value="Computer Science & Engineering">Computer Science & Engineering</option>
+              <option value="Information Technology">Information Technology</option>
+              <option value="Electronics & Communication Engineering">Electronics & Communication Engineering</option>
+              <option value="Electrical & Electronics Engineering">Electrical & Electronics Engineering</option>
+              <option value="Mechanical Engineering">Mechanical Engineering</option>
+              <option value="Civil Engineering">Civil Engineering</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Graduating Batch Year</label>
+            <input type="number" name="batch_year" class="form-control" value="2026">
+          </div>
+        </div>
+
+        <div class="grid grid-4 gap-4">
+          <div class="form-group">
+            <label class="form-label">Current CGPA</label>
+            <input type="number" step="0.01" min="0" max="10" name="cgpa" class="form-control" value="8.2" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">10th %</label>
+            <input type="number" step="0.1" name="tenth_percentage" class="form-control" value="88.0">
+          </div>
+          <div class="form-group">
+            <label class="form-label">12th %</label>
+            <input type="number" step="0.1" name="twelfth_percentage" class="form-control" value="87.5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Backlogs</label>
+            <input type="number" name="active_backlogs" class="form-control" value="0">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Technical Skills (Comma separated)</label>
+          <input type="text" name="skills" class="form-control" value="Python, SQL, HTML, CSS, JavaScript" placeholder="e.g. Python, SQL, React, Java, Docker">
+        </div>
+      </div>
+
+      <div class="grid grid-2 gap-4">
+        <div class="form-group">
+          <label class="form-label">Password *</label>
+          <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Confirm Password *</label>
+          <input type="password" name="confirm_password" class="form-control" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; padding: 0.75rem;">
+        Complete Registration &rarr;
+      </button>
+    </form>
+
+    <div style="text-align: center; margin-top: 1.5rem; font-size: 0.85rem; color: var(--text-muted);">
+      Already have an account? <a href="{{ url_for('auth.login') }}" style="color: #38bdf8; font-weight: 600;">Sign In</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function toggleRoleFields(role) {
+  const studentFields = document.querySelectorAll('.student-field');
+  const recruiterFields = document.querySelectorAll('.recruiter-field');
+  if (role === 'recruiter') {
+    studentFields.forEach(f => f.style.display = 'none');
+    recruiterFields.forEach(f => f.style.display = 'block');
+  } else {
+    studentFields.forEach(f => f.style.display = 'block');
+    recruiterFields.forEach(f => f.style.display = 'none');
+  }
+}
+</script>
+{% endblock %}
